@@ -1,7 +1,5 @@
 # hacky, but ...
 
-CXX = $(CXX_FOR_BUILD)
-
 AM_CPPFLAGS = \
 	$(dbus_CFLAGS) \
 	$(xml_CFLAGS) \
