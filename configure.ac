@@ -21,6 +21,13 @@ AC_ARG_ENABLE(ecore,
 	[enable_ecore=yes]
 )
 
+AC_ARG_ENABLE(asio,
+	AS_HELP_STRING([--enable-asio],
+		[enable asio integration]),
+	[enable_asio=$enableval],
+	[enable_asio=yes]
+)
+
 AC_ARG_ENABLE(glib,
 	AS_HELP_STRING([--enable-glib],
 		[enable glib integration]),
@@ -134,6 +141,14 @@ else
 AM_CONDITIONAL(ENABLE_ECORE, test 0 = 1)
 fi
 
+if test "$enable_asio" = "yes" ; then
+BOOST_REQUIRE
+BOOST_ASIO
+AM_CONDITIONAL(ENABLE_ASIO, test 1 = 1)
+else
+AM_CONDITIONAL(ENABLE_ASIO, test 0 = 1)
+fi
+
 if test "$enable_tests" = "yes" ; then
 AM_CONDITIONAL(ENABLE_TESTS, test 1 = 1)
 else
@@ -215,6 +230,7 @@ AC_OUTPUT(
         src/integration/Makefile
         src/integration/ecore/Makefile
         src/integration/glib/Makefile
+        src/integration/asio/Makefile
         tools/Makefile
 	test/Makefile
 	test/generator/Makefile
@@ -230,12 +246,15 @@ AC_OUTPUT(
 	examples/hal/Makefile
 	examples/glib/Makefile
 	examples/echo_ecore/Makefile
+	examples/asio/Makefile
 	dbus-c++-1.pc
 	dbus-c++-1-uninstalled.pc
 	dbus-c++-ecore-1.pc
 	dbus-c++-ecore-1-uninstalled.pc
 	dbus-c++-glib-1.pc
 	dbus-c++-glib-1-uninstalled.pc
+	dbus-c++-asio-1.pc
+	dbus-c++-asio-1-uninstalled.pc
 	libdbus-c++.spec
 )
 
@@ -246,6 +265,7 @@ echo
 echo "Mainloop integration support:"
 echo "ecore ......................... $enable_ecore"
 echo "glib........................... $enable_glib"
+echo "asio........................... $enable_asio"
 echo
 echo "Optional build items:"
 echo "build tests.................... $enable_tests"

@@ -8,12 +8,16 @@ if ENABLE_ECORE
 PKG_CONFIG_ECORE = dbus-c++-ecore-1.pc
 endif
 
+if ENABLE_ASIO
+PKG_CONFIG_ASIO = dbus-c++-asio-1.pc
+endif
+
 EXTRA_DIST = autogen.sh bootstrap libdbus-c++.spec.in
 
 ACLOCAL_AMFLAGS = -I m4
 
 pkgconfigdir = $(libdir)/pkgconfig
-pkgconfig_DATA = dbus-c++-1.pc $(PKG_CONFIG_GLIB) $(PKG_CONFIG_ECORE)
+pkgconfig_DATA = dbus-c++-1.pc $(PKG_CONFIG_GLIB) $(PKG_CONFIG_ECORE) $(PKG_CONFIG_ASIO)
 
 MAINTAINERCLEANFILES = \
 	configure \
