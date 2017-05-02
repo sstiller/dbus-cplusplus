@@ -26,6 +26,7 @@
 #define __DBUSXX_EVENTLOOP_INTEGRATION_H
 
 #include <errno.h>
+#include <unistd.h>
 #include "api.h"
 #include "dispatcher.h"
 #include "util.h"
