@@ -28,6 +28,7 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/asio.hpp>
+#include <boost/asio/local/stream_protocol.hpp>
 #include <boost/enable_shared_from_this.hpp>
 
 #include "api.h"
@@ -67,7 +68,7 @@ class DXXAPI BusWatch : public Watch
 {
 private:
 
-  BusWatch(Watch::Internal *, boost::asio::io_service& ioService);
+  BusWatch(Watch::Internal *, boost::asio::io_service& ioService, BusDispatcher* bd);
 
   ~BusWatch();
 
@@ -80,11 +81,13 @@ private:
 private:
   boost::asio::io_service& ioService;
   //boost::asio::deadline_timer timer;
-  boost::asio::posix::basic_stream_descriptor<> dbusFdStream;
+  //boost::asio::posix::stream_descriptor dbusFdStream;
+  boost::asio::local::stream_protocol::socket dbusFdStream;
   bool dbusFdStreamEnabled;
   void watchHandlerRead(const boost::system::error_code& error);
   void watchHandlerWrite(const boost::system::error_code& error);
-
+  BusDispatcher* bd;
+  
   friend class BusDispatcher;
 };
 

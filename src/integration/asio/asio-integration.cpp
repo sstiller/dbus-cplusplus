@@ -78,7 +78,7 @@ void Asio::BusTimeout::timeout_handler(const boost::system::error_code& ec)
 
 void Asio::BusTimeout::_enable()
 {
-  debug_log("Asio::BusTimeout::_enable()");
+  debug_log("Asio::BusTimeout::_enable(), %i millis", Timeout::interval());
   timer.expires_from_now(boost::posix_time::millisec(Timeout::interval()));
   timer.async_wait(boost::bind(&Asio::BusTimeout::timeout_handler, this, _1));
 }
@@ -91,11 +91,12 @@ void Asio::BusTimeout::_disable()
 
 // BusWatch
 
-Asio::BusWatch::BusWatch(Watch::Internal *wi, boost::asio::io_service& ioService)
-  : Watch(wi),
-    ioService(ioService),
-    dbusFdStream(ioService),
-    dbusFdStreamEnabled(false)
+Asio::BusWatch::BusWatch(Watch::Internal *wi, boost::asio::io_service& ioService, BusDispatcher* bd)
+: Watch(wi),
+  ioService(ioService),
+  dbusFdStream(ioService),
+  dbusFdStreamEnabled(false),
+  bd(bd)
 {
   if (Watch::enabled())
   {
@@ -122,7 +123,7 @@ void Asio::BusWatch::toggle()
 
 void Asio::BusWatch::watchHandlerRead(const boost::system::error_code& error)
 {
-  debug_log(__PRETTY_FUNCTION__);
+  debug_log("%s called, ptr=%p", __PRETTY_FUNCTION__, this);
 
   if(!error)
   {
@@ -143,6 +144,9 @@ void Asio::BusWatch::watchHandlerRead(const boost::system::error_code& error)
       handle(DBUS_WATCH_ERROR);
     }
   }
+
+  bd->dispatch_pending();
+
   dbusFdStream.async_read_some(boost::asio::null_buffers(),
                                boost::bind(&Asio::BusWatch::watchHandlerRead,
                                            this,
@@ -151,9 +155,10 @@ void Asio::BusWatch::watchHandlerRead(const boost::system::error_code& error)
                               );    
   
 }
+
 void Asio::BusWatch::watchHandlerWrite(const boost::system::error_code& error)
 {
-  debug_log(__PRETTY_FUNCTION__);
+  debug_log("%s called, ptr=%p", __PRETTY_FUNCTION__, this);
 
   if(!error)
   {
@@ -174,6 +179,8 @@ void Asio::BusWatch::watchHandlerWrite(const boost::system::error_code& error)
       handle(DBUS_WATCH_ERROR);
     }
   }
+  bd->dispatch_pending();
+
   dbusFdStream.async_write_some(boost::asio::null_buffers(),
                                 boost::bind(&Asio::BusWatch::watchHandlerWrite,
                                             this,
@@ -184,10 +191,11 @@ void Asio::BusWatch::watchHandlerWrite(const boost::system::error_code& error)
 
 void Asio::BusWatch::_enable()
 {
-  debug_log(__PRETTY_FUNCTION__);
+  debug_log("%s called, fd = %i", __PRETTY_FUNCTION__, descriptor());
   //TODO: Flag for read/write detection?
   int flags = Watch::flags();
-  dbusFdStream.assign(descriptor());
+  dbusFdStream.assign(boost::asio::local::stream_protocol(),
+                      descriptor());
   dbusFdStreamEnabled = true;
   if (flags & DBUS_WATCH_READABLE)
   {
@@ -228,7 +236,7 @@ Timeout *Asio::BusDispatcher::add_timeout(Timeout::Internal *wi)
 {
   Timeout *t = new Asio::BusTimeout(wi, ioService);
 
-  debug_log("asio: added timeout %p (%s)", t, t->enabled() ? "on" : "off");
+  debug_log("asio: added timeout %p (%sabled)", t, t->enabled() ? "en" : "dis");
 
   return t;
 }
@@ -242,12 +250,15 @@ void Asio::BusDispatcher::rem_timeout(Timeout *t)
 
 Watch *Asio::BusDispatcher::add_watch(Watch::Internal *wi)
 {
-  Watch* watchPtr = new Asio::BusWatch(wi, ioService);
+  Watch* watchPtr = new Asio::BusWatch(wi, ioService, this);
   boost::shared_ptr<Watch> sharedWatchPtr(watchPtr);
   watchPtrMap[watchPtr] = sharedWatchPtr;
 
-  debug_log("asio: added watch %p (%s) fd=%d flags=%d",
-            watchPtr, watchPtr->enabled() ? "on" : "off", watchPtr->descriptor(), watchPtr->flags()
+  debug_log("asio: added watch %p (%sabled) fd=%d flags=0x%02x",
+            watchPtr,
+            watchPtr->enabled() ? "en" : "dis",
+            watchPtr->descriptor(),
+            watchPtr->flags()
            );
   return watchPtr;
 }
