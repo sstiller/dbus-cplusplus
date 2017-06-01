@@ -1,0 +1,21 @@
+before_script:
+  - |
+    curl -k --request GET --header "PRIVATE-TOKEN: zsBWGoKnhMQGA7zQPvL2" "https://gitlab.elfin.de/api/v4/projects/269/repository/files/get-dependencies%2Esh/raw?ref=master" > .ci_get-dependencies.sh
+  - chmod +x .ci_get-dependencies.sh
+  - ./.ci_get-dependencies.sh
+stages:
+  - build
+
+build:
+  stage: build
+  script:
+    - ./autogen.sh --disable-ecore --disable-glib --disable-doxygen-docs --disable-tests --disable-examples
+    - make -j`cat /proc/cpuinfo | grep processor | wc -l`
+    - export DESTDIR=$(mktemp -d)
+    - make install
+    - tar -cjvf "$CI_PROJECT_NAME.tar.bz2" -C "$DESTDIR" .
+  artifacts:
+    expire_in: 6 weeks
+    paths:
+      - "$CI_PROJECT_NAME.tar.bz2"
+    when: on_success
