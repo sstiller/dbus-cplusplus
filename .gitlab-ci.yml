@@ -1,8 +1,3 @@
-before_script:
-  - |
-    curl -k --request GET --header "PRIVATE-TOKEN: zsBWGoKnhMQGA7zQPvL2" "https://gitlab.elfin.de/api/v4/projects/269/repository/files/get-dependencies%2Esh/raw?ref=master" > .ci_get-dependencies.sh
-  - chmod +x .ci_get-dependencies.sh
-  - ./.ci_get-dependencies.sh
 stages:
   - build
 
