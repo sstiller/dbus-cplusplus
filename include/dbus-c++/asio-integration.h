@@ -80,9 +80,7 @@ private:
 
 private:
   boost::asio::io_service& ioService;
-  //boost::asio::deadline_timer timer;
-  //boost::asio::posix::stream_descriptor dbusFdStream;
-  boost::asio::local::stream_protocol::socket dbusFdStream;
+  boost::asio::posix::stream_descriptor dbusFdStream;
   bool dbusFdStreamEnabled;
   void watchHandlerRead(const boost::system::error_code& error);
   void watchHandlerWrite(const boost::system::error_code& error);

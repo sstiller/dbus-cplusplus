@@ -194,8 +194,7 @@ void Asio::BusWatch::_enable()
   debug_log("%s called, fd = %i", __PRETTY_FUNCTION__, descriptor());
   //TODO: Flag for read/write detection?
   int flags = Watch::flags();
-  dbusFdStream.assign(boost::asio::local::stream_protocol(),
-                      descriptor());
+  dbusFdStream.assign(descriptor());
   dbusFdStreamEnabled = true;
   if (flags & DBUS_WATCH_READABLE)
   {
@@ -220,6 +219,7 @@ void Asio::BusWatch::_enable()
 
 void Asio::BusWatch::_disable()
 {
+  debug_log(__PRETTY_FUNCTION__);  
   if(dbusFdStreamEnabled)
   {
     dbusFdStream.cancel();
@@ -250,6 +250,7 @@ void Asio::BusDispatcher::rem_timeout(Timeout *t)
 
 Watch *Asio::BusDispatcher::add_watch(Watch::Internal *wi)
 {
+  debug_log("%s called", __PRETTY_FUNCTION__);
   Watch* watchPtr = new Asio::BusWatch(wi, ioService, this);
   boost::shared_ptr<Watch> sharedWatchPtr(watchPtr);
   watchPtrMap[watchPtr] = sharedWatchPtr;
@@ -265,6 +266,6 @@ Watch *Asio::BusDispatcher::add_watch(Watch::Internal *wi)
 
 void Asio::BusDispatcher::rem_watch(Watch *w)
 {
-  debug_log("asio: removed watch %p", w);
+  debug_log("asio: remove watch %p", w);
   watchPtrMap.erase(w);
 }

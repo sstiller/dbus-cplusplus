@@ -129,7 +129,7 @@ Eina_Bool Ecore::BusWatch::watch_dispatch(void *data, Ecore_Fd_Handler *fdh)
 
 void Ecore::BusWatch::_enable()
 {
-  debug_log("Ecore::BusWatch::_enable()");
+  debug_log(__PRETTY_FUNCTION__);
 
   fd_handler = ecore_main_fd_handler_add(descriptor(),
                                          (Ecore_Fd_Handler_Flags)(ECORE_FD_READ | ECORE_FD_WRITE),
@@ -139,6 +139,7 @@ void Ecore::BusWatch::_enable()
 
 void Ecore::BusWatch::_disable()
 {
+  debug_log(__PRETTY_FUNCTION__);
   if (fd_handler)
   {
     ecore_main_fd_handler_del(fd_handler);
@@ -178,6 +179,8 @@ void Ecore::BusDispatcher::rem_timeout(Timeout *t)
 
 Watch *Ecore::BusDispatcher::add_watch(Watch::Internal *wi)
 {
+  debug_log("%s called", __PRETTY_FUNCTION__);
+  
   Ecore::BusWatch *w = new Ecore::BusWatch(wi);
   w->data(this);
 
