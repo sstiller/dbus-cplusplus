@@ -16,3 +16,4 @@ Makefile
 *.o
 .deps
 .libs
+.anjuta*
