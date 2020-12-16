@@ -1,0 +1,12 @@
+prefix=
+exec_prefix=
+libdir=src
+includedir=include
+
+Name: @PACKAGE@-asio
+Description: Native C++ bindings for D-Bus (boost asio Mainloop), Not Installed
+Requires:
+Version: @VERSION@
+Libs: ${pcfiledir}/${libdir}/integration/glib/libdbus-c++-asio-1.la
+Cflags: -I${pcfiledir}/${includedir}
+

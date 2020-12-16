@@ -5,7 +5,8 @@ AM_CPPFLAGS = \
 	$(xml_CFLAGS) \
 	-I$(top_srcdir)/include \
 	-I$(top_builddir)/include \
-	-Wall
+	-Wall \
+  $(PTHREAD_CFLAGS)
 
 if CROSS_COMPILING
 libdbus_cxx_la = $(BUILD_LIBDBUS_CXX_DIR)/src/libdbus-c++-1.la
@@ -21,7 +22,7 @@ dbusxx_xml2cpp_SOURCES = xml.h xml.cpp xml2cpp.h xml2cpp.cpp \
 dbusxx_xml2cpp_LDADD = $(xml_LIBS)
 
 dbusxx_introspect_SOURCES = introspect.h introspect.cpp
-dbusxx_introspect_LDADD = $(libdbus_cxx_la)
+dbusxx_introspect_LDADD = $(libdbus_cxx_la) $(PTHREAD_LIBS)
 
 MAINTAINERCLEANFILES = \
 	Makefile.in

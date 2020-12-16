@@ -1,0 +1,18 @@
+before_script:
+  - apt-get install -y libdbus-1-dev
+stages:
+  - build
+
+build:
+  stage: build
+  script:
+    - ./autogen.sh --disable-ecore --disable-glib --disable-doxygen-docs --disable-tests --disable-examples
+    - make -j`cat /proc/cpuinfo | grep processor | wc -l`
+    - export DESTDIR=$(mktemp -d)
+    - make install
+    - tar -cjvf "$CI_PROJECT_NAME.tar.bz2" -C "$DESTDIR" .
+  artifacts:
+    expire_in: 6 weeks
+    paths:
+      - "$CI_PROJECT_NAME.tar.bz2"
+    when: on_success

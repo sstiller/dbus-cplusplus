@@ -34,6 +34,7 @@ libdbus_c___1_la_LIBADD = \
 AM_CPPFLAGS = \
 	$(dbus_CFLAGS) \
 	$(glib_CFLAGS) \
+	$(BOOST_CPPFLAGS)\
 	$(ecore_CFLAGS)
 
 SUBDIRS = \
